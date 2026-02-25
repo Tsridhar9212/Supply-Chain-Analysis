@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benefits — Supply Chain Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --orange: #d44000;
+            --black:  #111111;
+            --cream:  #f0ece4;
+            --nav:    #1a1a1a;
+            --border: #d8d3ca;
+            --muted:  #888580;
+            --text:   #1e1e1e;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--cream);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── NAVBAR ── */
+        nav {
+            background: var(--nav);
+            padding: 0 32px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-shrink: 0;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-badge {
+            background: var(--orange);
+            color: #fff;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            font-weight: 500;
+            padding: 4px 8px;
+            border-radius: 3px;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-title {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 13px;
+            color: #fff;
+            letter-spacing: 0.08em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            color: #888;
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: #fff; }
+        .nav-links a.active { color: #fff; }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            color: #888;
+            letter-spacing: 0.1em;
+        }
+
+        .dot {
+            width: 7px; height: 7px;
+            background: #4caf50;
+            border-radius: 50%;
+        }
+
+        /* ── PAGE LAYOUT ── */
+        .page {
+            display: flex;
+            flex: 1;
+        }
+
+        /* ── LEFT MAIN ── */
+        .main {
+            flex: 1;
+            padding: 64px 64px 80px;
+            border-right: 1px solid var(--border);
+        }
+
+        /* Eyebrow — exactly like index */
+        .eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 36px;
+        }
+
+        .eyebrow::before {
+            content: '';
+            width: 28px;
+            height: 1.5px;
+            background: var(--orange);
+            flex-shrink: 0;
+        }
+
+        /* Big stacked title — exactly like index */
+        .big-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: clamp(88px, 12vw, 148px);
+            line-height: 0.9;
+            text-transform: uppercase;
+            letter-spacing: -0.01em;
+            color: var(--black);
+            margin-bottom: 52px;
+        }
+
+        .big-title .accent { color: var(--orange); }
+
+        /* Description — like index body text */
+        .desc {
+            font-size: 15px;
+            font-weight: 300;
+            color: #555;
+            line-height: 1.8;
+            max-width: 460px;
+            margin-bottom: 0;
+        }
+
+        /* ── RIGHT SIDEBAR ── */
+        .sidebar {
+            width: 380px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 52px;
+            height: calc(100vh - 52px);
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+        .sidebar::-webkit-scrollbar { display: none; }
+
+        .sidebar-header {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            color: var(--muted);
+            text-transform: uppercase;
+            padding: 28px 32px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-item {
+            padding: 22px 32px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .sidebar-item:hover { background: rgba(212,64,0,0.04); }
+        .sidebar-item:hover .si-title { color: var(--orange); }
+
+        .si-tag {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.14em;
+            color: var(--orange);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .si-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--black);
+            margin-bottom: 4px;
+            transition: color 0.2s;
+            line-height: 1.3;
+        }
+
+        .si-desc {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 300;
+            line-height: 1.5;
+        }
+
+        .si-icon {
+            color: var(--border);
+            font-size: 14px;
+            padding-top: 2px;
+            flex-shrink: 0;
+            transition: color 0.2s;
+            font-style: normal;
+        }
+
+        .sidebar-item:hover .si-icon { color: var(--orange); }
+
+        /* Insight box at bottom of sidebar */
+        .insight-box {
+            margin: 24px 32px 32px;
+            background: var(--black);
+            border-radius: 6px;
+            padding: 24px;
+        }
+
+        .ib-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.18em;
+            color: var(--orange);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .insight-box p {
+            font-size: 13px;
+            font-weight: 300;
+            color: rgba(255,255,255,0.6);
+            line-height: 1.75;
+        }
+
+        .insight-box p strong {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        @media (max-width: 900px) {
+            .page { flex-direction: column; }
+            .sidebar {
+                width: 100%;
+                position: static;
+                height: auto;
+                border-top: 1px solid var(--border);
+            }
+            .main { padding: 40px 28px 60px; border-right: none; }
+            .big-title { font-size: clamp(72px, 18vw, 130px); }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAV — identical to index -->
+<nav>
+    <div class="nav-left">
+        <span class="nav-badge">SCA</span>
+        <span class="nav-title">Supply Chain Analysis</span>
+    </div>
+    <ul class="nav-links">
+        <li><a href="about.html">About</a></li>
+        <li><a href="benefits.html" class="active">Benefits</a></li>
+        <li><a href="future.html">Future Scope</a></li>
+    </ul>
+    <div class="nav-right">
+        <div class="dot"></div>
+        SYSTEM ACTIVE
+    </div>
+</nav>
+
+<div class="page">
+
+    <!-- LEFT MAIN — mirrors index hero layout -->
+    <main class="main">
+
+        <div class="eyebrow">Supply Chain Management</div>
+
+        <h1 class="big-title">
+            KEY<br>
+            <span class="accent">BENE</span><br>
+            FITS
+        </h1>
+
+        <p class="desc">
+            A well-managed supply chain delivers measurable advantages
+            across every layer of your business — from procurement and
+            supplier relationships to the final customer experience.
+        </p>
+
+    </main>
+
+    <!-- RIGHT SIDEBAR — sticky quick access -->
+    <aside class="sidebar">
+
+        <div class="sidebar-header">// Quick Access</div>
+
+        <div class="sidebar-item">
+            <div>
+                <div class="si-tag">01 / Quality</div>
+                <div class="si-title">Quality Control</div>
+                <div class="si-desc">Standards enforcement & defect reduction</div>
+            </div>
+            <span class="si-icon">↗</span>
+        </div>
+
+        <div class="sidebar-item">
+            <div>
+                <div class="si-tag">02 / Procurement</div>
+                <div class="si-title">Smarter Purchasing</div>
+                <div class="si-desc">Cost reduction & inventory optimization</div>
+            </div>
+            <span class="si-icon">↗</span>
+        </div>
+
+        <div class="sidebar-item">
+            <div>
+                <div class="si-tag">03 / Finance</div>
+                <div class="si-title">Revenue & Profitability</div>
+                <div class="si-desc">Profitability & operational efficiency</div>
+            </div>
+            <span class="si-icon">↗</span>
+        </div>
+
+        <div class="sidebar-item">
+            <div>
+                <div class="si-tag">04 / Partners</div>
+                <div class="si-title">Supplier Collaboration</div>
+                <div class="si-desc">Long-term partnerships & reliability</div>
+            </div>
+            <span class="si-icon">↗</span>
+        </div>
+
+        <div class="sidebar-item">
+            <div>
+                <div class="si-tag">05 / Customer</div>
+                <div class="si-title">Customer Experience</div>
+                <div class="si-desc">Fulfilment, satisfaction & retention</div>
+            </div>
+            <span class="si-icon">↗</span>
+        </div>
+
+        <div class="sidebar-item">
+            <div>
+                <div class="si-tag">06 / Analytics</div>
+                <div class="si-title">Predictive Accuracy</div>
+                <div class="si-desc">Demand forecasting & risk management</div>
+            </div>
+            <span class="si-icon">↗</span>
+        </div>
+
+        <div class="insight-box">
+            <div class="ib-label">// Key Insight</div>
+            <p>Manufacturing industries depend on the timely availability of raw materials. Building a <strong>reliable supplier network</strong> is the foundation that makes every other advantage possible.</p>
+        </div>
+
+    </aside>
+
+</div>
+
+</body>
+</html>

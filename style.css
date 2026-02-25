@@ -1,0 +1,42 @@
+*{
+    padding: o;
+    margin: 0;
+}
+
+body{
+    font-family: "Nunito Sans", serif;
+    font-optical-sizing: auto;
+    font-weight: weight;
+    font-style: normal;
+    font-variation-settings: "wdth" 100,"YTLC" 500;
+}
+a{
+    text-decoration: none;
+    color: #000000;
+}
+.head{
+    padding-top: 40px;
+    text-align: center;
+}
+.box{
+    width: 250px;
+    padding: 80px;
+    background-color: rgba(102, 128, 214, 0.704);
+    border: 2px solid #333;
+    margin: 20px auto;
+    text-align: center;
+}
+.row-1{
+    display: flex;
+    padding: 50px;
+}
+.row-1 :hover{
+    transition: 0.5 ease-in-out;
+    background-color: rgba(46, 54, 74, 0.101);
+}
+.header{
+    background: radial-gradient(#ffffff,#41658b);
+}
+.header .row-1{
+    margin-top: 70px;
+}

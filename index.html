@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supply Chain Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cabinet+Grotesk:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --c-bg: #f0ede6;
+            --c-ink: #0f0d0a;
+            --c-mid: #6b6560;
+            --c-accent: #d4420a;
+            --c-card: #ffffff;
+            --c-border: rgba(15,13,10,0.1);
+        }
+
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Cabinet Grotesk', sans-serif;
+            background: var(--c-bg);
+            color: var(--c-ink);
+            overflow-x: hidden;
+        }
+        a { text-decoration: none; color: inherit; }
+
+        /* ─── NAV ─── */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            height: 56px;
+            background: var(--c-ink);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 0.1em;
+        }
+        .nav-logo .badge {
+            background: var(--c-accent);
+            color: #fff;
+            font-size: 0.6rem;
+            letter-spacing: 0.12em;
+            padding: 3px 8px;
+            border-radius: 2px;
+        }
+        .nav-links { display: flex; align-items: center; }
+        .nav-links a {
+            color: rgba(255,255,255,0.45);
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            font-weight: 500;
+            padding: 0 20px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            border-left: 1px solid rgba(255,255,255,0.06);
+            transition: color 0.2s, background 0.2s;
+        }
+        .nav-links a:hover { color: #fff; background: rgba(255,255,255,0.04); }
+        .nav-status {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.62rem;
+            color: rgba(255,255,255,0.35);
+        }
+        .status-dot {
+            width: 6px; height: 6px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: blink 1.8s ease-in-out infinite;
+        }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+        /* ─── HERO ─── */
+        .hero {
+            margin-top: 56px;
+            min-height: calc(100vh - 56px);
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            border-bottom: 1px solid var(--c-border);
+        }
+        .hero-left {
+            padding: 80px 60px;
+            border-right: 1px solid var(--c-border);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .hero-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.14em;
+            color: var(--c-mid);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .hero-tag::before {
+            content: '';
+            display: block;
+            width: 24px; height: 1px;
+            background: var(--c-accent);
+        }
+        .hero-headline {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(5rem, 10vw, 10rem);
+            line-height: 0.9;
+            letter-spacing: -0.01em;
+            color: var(--c-ink);
+            margin: 40px 0;
+        }
+        .hero-headline .line-accent { color: var(--c-accent); display: block; }
+        .hero-sub {
+            max-width: 440px;
+            font-size: 0.95rem;
+            font-weight: 300;
+            color: var(--c-mid);
+            line-height: 1.7;
+        }
+        .hero-meta { display: flex; gap: 40px; margin-top: 60px; }
+        .meta-item { display: flex; flex-direction: column; gap: 4px; }
+        .meta-value {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.4rem;
+            line-height: 1;
+        }
+        .meta-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.12em;
+            color: var(--c-mid);
+            text-transform: uppercase;
+        }
+
+        /* Right panel */
+        .hero-right { display: flex; flex-direction: column; }
+        .panel-header {
+            padding: 20px 28px;
+            border-bottom: 1px solid var(--c-border);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.14em;
+            color: var(--c-mid);
+            text-transform: uppercase;
+            background: rgba(255,255,255,0.4);
+        }
+        .quick-nav { display: flex; flex-direction: column; flex: 1; }
+        .quick-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 22px 28px;
+            border-bottom: 1px solid var(--c-border);
+            transition: background 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .quick-item::after {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: var(--c-accent);
+            transform: scaleY(0);
+            transform-origin: bottom;
+            transition: transform 0.2s ease;
+        }
+        .quick-item:hover { background: rgba(255,255,255,0.65); }
+        .quick-item:hover::after { transform: scaleY(1); }
+        .qi-info { display: flex; flex-direction: column; gap: 3px; }
+        .qi-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.55rem;
+            color: var(--c-accent);
+            letter-spacing: 0.1em;
+        }
+        .qi-title { font-size: 0.92rem; font-weight: 700; }
+        .qi-desc { font-size: 0.72rem; color: var(--c-mid); font-weight: 300; }
+        .qi-arrow {
+            width: 34px; height: 34px;
+            border: 1px solid var(--c-border);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem;
+            color: var(--c-mid);
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .quick-item:hover .qi-arrow {
+            background: var(--c-ink);
+            color: #fff;
+            border-color: var(--c-ink);
+            transform: rotate(45deg);
+        }
+
+        /* ─── ANALYTICS BANNER ─── */
+        .analytics-banner {
+            margin: 60px 60px;
+            background: var(--c-ink);
+            border-radius: 3px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            overflow: hidden;
+            position: relative;
+        }
+        .analytics-banner::before {
+            content: 'ANALYTICS';
+            position: absolute;
+            right: -30px; top: 50%;
+            transform: translateY(-50%) rotate(90deg);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 7rem;
+            color: rgba(255,255,255,0.025);
+            letter-spacing: 0.12em;
+            pointer-events: none;
+        }
+        .an-card {
+            padding: 44px 40px;
+            border-right: 1px solid rgba(255,255,255,0.07);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            transition: background 0.2s;
+        }
+        .an-card:last-child { border-right: none; }
+        .an-card:hover { background: rgba(255,255,255,0.04); }
+        .an-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.55rem;
+            letter-spacing: 0.14em;
+            color: var(--c-accent);
+            text-transform: uppercase;
+        }
+        .an-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            color: #fff;
+            letter-spacing: 0.02em;
+            line-height: 1;
+        }
+        .an-desc {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.38);
+            font-weight: 300;
+            line-height: 1.6;
+            flex: 1;
+        }
+        .an-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 2px;
+            color: rgba(255,255,255,0.65);
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-weight: 500;
+            transition: all 0.2s;
+            width: fit-content;
+        }
+        .an-cta:hover { background: var(--c-accent); border-color: var(--c-accent); color: #fff; }
+
+        /* ─── PROCESS ─── */
+        .section { padding: 0 60px 80px; }
+        .section-head {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--c-border);
+        }
+        .sh-left { display: flex; flex-direction: column; gap: 8px; }
+        .sh-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.16em;
+            color: var(--c-accent);
+            text-transform: uppercase;
+        }
+        .sh-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.2rem, 4vw, 3.8rem);
+            line-height: 1;
+        }
+        .sh-right {
+            font-size: 0.8rem;
+            color: var(--c-mid);
+            font-weight: 300;
+            max-width: 260px;
+            text-align: right;
+            line-height: 1.6;
+        }
+
+        .process-strip { display: flex; }
+        .process-step {
+            flex: 1;
+            border: 1px solid var(--c-border);
+            border-right: none;
+            padding: 32px 22px;
+            background: var(--c-card);
+            position: relative;
+            overflow: hidden;
+            transition: background 0.25s;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            cursor: pointer;
+        }
+        .process-step:last-child { border-right: 1px solid var(--c-border); }
+        .process-step::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--c-accent);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.35s ease;
+        }
+        .process-step:hover { background: var(--c-ink); }
+        .process-step:hover .ps-num { color: var(--c-accent); }
+        .process-step:hover .ps-title { color: #fff; }
+        .process-step:hover .ps-desc { color: rgba(255,255,255,0.4); }
+        .process-step:hover::before { transform: scaleX(1); }
+        .ps-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            color: var(--c-accent);
+            letter-spacing: 0.1em;
+            transition: color 0.25s;
+        }
+        .ps-icon { font-size: 1.4rem; line-height: 1; }
+        .ps-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.55rem;
+            letter-spacing: 0.02em;
+            color: var(--c-ink);
+            transition: color 0.25s;
+        }
+        .ps-desc {
+            font-size: 0.73rem;
+            color: var(--c-mid);
+            font-weight: 300;
+            line-height: 1.55;
+            transition: color 0.25s;
+        }
+        .ps-link {
+            margin-top: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.58rem;
+            letter-spacing: 0.1em;
+            color: var(--c-accent);
+            text-transform: uppercase;
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+        .process-step:hover .ps-link { opacity: 1; }
+
+        /* ─── FOOTER ─── */
+        footer {
+            border-top: 1px solid var(--c-border);
+            padding: 26px 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255,255,255,0.3);
+        }
+        .footer-left {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.1em;
+            color: var(--c-mid);
+        }
+        .footer-right {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            color: var(--c-mid);
+            letter-spacing: 0.08em;
+        }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 1024px) {
+            .hero { grid-template-columns: 1fr; min-height: auto; }
+            .hero-right { display: none; }
+            .analytics-banner { grid-template-columns: 1fr; margin: 40px 24px; }
+            .an-card { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.07); }
+            .section { padding: 0 24px 60px; }
+            footer { padding: 20px 24px; }
+        }
+        @media (max-width: 768px) {
+            .hero-left { padding: 48px 24px; }
+            .process-strip { flex-direction: column; }
+            .process-step { border-right: 1px solid var(--c-border); border-bottom: none; }
+            .process-step:last-child { border-bottom: 1px solid var(--c-border); }
+            nav { padding: 0 20px; }
+            .nav-links { display: none; }
+            footer { flex-direction: column; gap: 8px; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <div class="nav-logo">
+            <span class="badge">SCA</span>
+            Supply Chain Analysis
+        </div>
+        <div class="nav-links">
+            <a href="about.html">About</a>
+            <a href="Benifits.html">Benefits</a>
+            <a href="FUTURE ENHANCEMENT.html">Future Scope</a>
+        </div>
+        <div class="nav-status">
+            <div class="status-dot"></div>
+            SYSTEM ACTIVE
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-left">
+            <div>
+                <div class="hero-tag">End-to-End Visibility Platform</div>
+                <h1 class="hero-headline">
+                    Supply
+                    <span class="line-accent">Chain</span>
+                    Analysis
+                </h1>
+                <p class="hero-sub">
+                    Comprehensive analytics across your entire supply chain. Monitor revenue, defect rates, transportation, and every process stage — in one unified view.
+                </p>
+            </div>
+            <div class="hero-meta">
+                <div class="meta-item">
+                    <div class="meta-value">8+</div>
+                    <div class="meta-label">Modules</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-value">5</div>
+                    <div class="meta-label">Chain Stages</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-value">360°</div>
+                    <div class="meta-label">Coverage</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-right">
+            <div class="panel-header">// Quick Access</div>
+            <div class="quick-nav">
+                <a class="quick-item" href="Revenu.html">
+                    <div class="qi-info">
+                        <div class="qi-num">01 / ANALYTICS</div>
+                        <div class="qi-title">Revenue Generated</div>
+                        <div class="qi-desc">Income breakdown by product &amp; region</div>
+                    </div>
+                    <div class="qi-arrow">↗</div>
+                </a>
+                <a class="quick-item" href="Transport.html">
+                    <div class="qi-info">
+                        <div class="qi-num">02 / ANALYTICS</div>
+                        <div class="qi-title">Transportation Mode</div>
+                        <div class="qi-desc">Carrier performance &amp; freight costs</div>
+                    </div>
+                    <div class="qi-arrow">↗</div>
+                </a>
+                <a class="quick-item" href="defect.html">
+                    <div class="qi-info">
+                        <div class="qi-num">03 / ANALYTICS</div>
+                        <div class="qi-title">Defect Rate</div>
+                        <div class="qi-desc">Quality metrics per product line</div>
+                    </div>
+                    <div class="qi-arrow">↗</div>
+                </a>
+                <a class="quick-item" href="Planning.html">
+                    <div class="qi-info">
+                        <div class="qi-num">04 / PROCESS</div>
+                        <div class="qi-title">Planning</div>
+                        <div class="qi-desc">Demand forecasting &amp; resource allocation</div>
+                    </div>
+                    <div class="qi-arrow">↗</div>
+                </a>
+                <a class="quick-item" href="Customer.html">
+                    <div class="qi-info">
+                        <div class="qi-num">05 / PROCESS</div>
+                        <div class="qi-title">Customer</div>
+                        <div class="qi-desc">Fulfilment, satisfaction &amp; returns</div>
+                    </div>
+                    <div class="qi-arrow">↗</div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ANALYTICS CARDS -->
+    <div class="analytics-banner">
+        <a class="an-card" href="Revenu.html">
+            <div class="an-num">01 — Revenue</div>
+            <div class="an-title">Revenue Generated</div>
+            <div class="an-desc">Track income streams across product categories, distribution channels, and geographic markets over time.</div>
+            <div class="an-cta">View Report ↗</div>
+        </a>
+        <a class="an-card" href="Transport.html">
+            <div class="an-num">02 — Logistics</div>
+            <div class="an-title">Transportation Mode</div>
+            <div class="an-desc">Compare cost-efficiency, speed, and reliability across air, road, sea, and rail freight carriers.</div>
+            <div class="an-cta">View Report ↗</div>
+        </a>
+        <a class="an-card" href="defect.html">
+            <div class="an-num">03 — Quality</div>
+            <div class="an-title">Defect Rate</div>
+            <div class="an-desc">Identify product failure trends and quality control gaps at each manufacturing and delivery stage.</div>
+            <div class="an-cta">View Report ↗</div>
+        </a>
+    </div>
+
+    <!-- PROCESS -->
+    <section class="section">
+        <div class="section-head">
+            <div class="sh-left">
+                <div class="sh-tag">// Supply Chain Process</div>
+                <div class="sh-title">Five Stage Pipeline</div>
+            </div>
+            <div class="sh-right">
+                From initial planning to final customer delivery — every stage monitored and measurable.
+            </div>
+        </div>
+
+        <div class="process-strip">
+            <a class="process-step" href="Planning.html">
+                <div class="ps-num">STAGE 01</div>
+                <div class="ps-icon">📋</div>
+                <div class="ps-title">Planning</div>
+                <div class="ps-desc">Demand forecasting, inventory targets, and resource allocation strategies.</div>
+                <div class="ps-link">Open ↗</div>
+            </a>
+            <a class="process-step" href="Manufacture.html">
+                <div class="ps-num">STAGE 02</div>
+                <div class="ps-icon">🏭</div>
+                <div class="ps-title">Manufacture</div>
+                <div class="ps-desc">Production scheduling, capacity utilization, and quality output tracking.</div>
+                <div class="ps-link">Open ↗</div>
+            </a>
+            <a class="process-step" href="Transportation.html">
+                <div class="ps-num">STAGE 03</div>
+                <div class="ps-icon">🚛</div>
+                <div class="ps-title">Transport</div>
+                <div class="ps-desc">Route optimization, carrier selection, and live delivery timelines.</div>
+                <div class="ps-link">Open ↗</div>
+            </a>
+            <a class="process-step" href="Shop.html">
+                <div class="ps-num">STAGE 04</div>
+                <div class="ps-icon">🏪</div>
+                <div class="ps-title">Shop</div>
+                <div class="ps-desc">Retail performance, stock levels, and sell-through rate analysis.</div>
+                <div class="ps-link">Open ↗</div>
+            </a>
+            <a class="process-step" href="Customer.html">
+                <div class="ps-num">STAGE 05</div>
+                <div class="ps-icon">👤</div>
+                <div class="ps-title">Customer</div>
+                <div class="ps-desc">Order fulfilment, satisfaction scores, and return analytics.</div>
+                <div class="ps-link">Open ↗</div>
+            </a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-left">© 2025 Supply Chain Analysis Platform</div>
+        <div class="footer-right">v1.0.0 · All systems operational</div>
+    </footer>
+
+</body>
+</html>

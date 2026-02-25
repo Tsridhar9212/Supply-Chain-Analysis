@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About — Supply Chain Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --orange: #d44000;
+            --black:  #111111;
+            --cream:  #f0ece4;
+            --nav:    #1a1a1a;
+            --border: #d8d3ca;
+            --muted:  #888580;
+            --text:   #1e1e1e;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--cream);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── NAVBAR ── */
+        nav {
+            background: var(--nav);
+            padding: 0 32px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-shrink: 0;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-badge {
+            background: var(--orange);
+            color: #fff;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            font-weight: 500;
+            padding: 4px 8px;
+            border-radius: 3px;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-title {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 13px;
+            color: #fff;
+            letter-spacing: 0.08em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            color: #888;
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: #fff; }
+        .nav-links a.active { color: #fff; }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            color: #888;
+            letter-spacing: 0.1em;
+        }
+
+        .dot {
+            width: 7px; height: 7px;
+            background: #4caf50;
+            border-radius: 50%;
+        }
+
+        /* ── PAGE LAYOUT ── */
+        .page {
+            display: flex;
+            flex: 1;
+        }
+
+        /* ── LEFT MAIN ── */
+        .main {
+            flex: 1;
+            padding: 64px 64px 80px;
+            border-right: 1px solid var(--border);
+        }
+
+        /* Eyebrow */
+        .eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 36px;
+        }
+
+        .eyebrow::before {
+            content: '';
+            width: 28px;
+            height: 1.5px;
+            background: var(--orange);
+            flex-shrink: 0;
+        }
+
+        /* Big stacked title */
+        .big-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: clamp(88px, 12vw, 148px);
+            line-height: 0.9;
+            text-transform: uppercase;
+            letter-spacing: -0.01em;
+            color: var(--black);
+            margin-bottom: 52px;
+        }
+
+        .big-title .accent { color: var(--orange); }
+
+        /* Description */
+        .desc {
+            font-size: 15px;
+            font-weight: 300;
+            color: #555;
+            line-height: 1.8;
+            max-width: 460px;
+            margin-bottom: 56px;
+        }
+
+        /* ── ABOUT CONTENT ── */
+        .content-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .content-block {
+            border-top: 1px solid var(--border);
+            padding: 28px 0;
+        }
+
+        .content-block:last-child {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .content-block p {
+            font-size: 14px;
+            font-weight: 300;
+            color: #444;
+            line-height: 1.85;
+            max-width: 580px;
+        }
+
+        .content-block p strong {
+            color: var(--black);
+            font-weight: 600;
+        }
+
+        .content-block p .hl {
+            color: var(--orange);
+            font-weight: 500;
+        }
+
+        /* Stats row */
+        .stats-row {
+            display: flex;
+            gap: 0;
+            border-top: 1px solid var(--border);
+            margin-top: 48px;
+        }
+
+        .stat {
+            flex: 1;
+            padding: 28px 0;
+            border-right: 1px solid var(--border);
+            padding-right: 32px;
+            margin-right: 32px;
+        }
+
+        .stat:last-child {
+            border-right: none;
+            margin-right: 0;
+        }
+
+        .stat-value {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: 42px;
+            color: var(--black);
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .stat-value span { color: var(--orange); }
+
+        .stat-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        /* Tags */
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 40px;
+        }
+
+        .tag {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 5px 12px;
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .tag:hover {
+            border-color: var(--orange);
+            color: var(--orange);
+        }
+
+        /* ── RIGHT SIDEBAR ── */
+        .sidebar {
+            width: 380px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 52px;
+            height: calc(100vh - 52px);
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+        .sidebar::-webkit-scrollbar { display: none; }
+
+        .sidebar-header {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            color: var(--muted);
+            text-transform: uppercase;
+            padding: 28px 32px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-item {
+            padding: 22px 32px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .sidebar-item:hover { background: rgba(212,64,0,0.04); }
+        .sidebar-item:hover .si-title { color: var(--orange); }
+
+        .si-tag {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.14em;
+            color: var(--orange);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .si-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--black);
+            margin-bottom: 4px;
+            transition: color 0.2s;
+            line-height: 1.3;
+        }
+
+        .si-desc {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 300;
+            line-height: 1.5;
+        }
+
+        .si-icon {
+            color: var(--border);
+            font-size: 14px;
+            padding-top: 2px;
+            flex-shrink: 0;
+            transition: color 0.2s;
+        }
+
+        .sidebar-item:hover .si-icon { color: var(--orange); }
+
+        /* Dark box */
+        .insight-box {
+            margin: 24px 32px 32px;
+            background: var(--black);
+            border-radius: 6px;
+            padding: 24px;
+        }
+
+        .ib-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.18em;
+            color: var(--orange);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .insight-box p {
+            font-size: 13px;
+            font-weight: 300;
+            color: rgba(255,255,255,0.6);
+            line-height: 1.75;
+        }
+
+        .insight-box p strong {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        @media (max-width: 900px) {
+            .page { flex-direction: column; }
+            .sidebar { width: 100%; position: static; height: auto; border-top: 1px solid var(--border); }
+            .main { padding: 40px 28px 60px; border-right: none; }
+            .big-title { font-size: clamp(72px, 18vw, 130px); }
+            .nav-links { display: none; }
+            .stats-row { flex-direction: column; gap: 0; }
+            .stat { border-right: none; border-bottom: 1px solid var(--border); padding: 20px 0; margin: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+    <div class="nav-left">
+        <span class="nav-badge">SCA</span>
+        <span class="nav-title">Supply Chain Analysis</span>
+    </div>
+    <ul class="nav-links">
+        <li><a href="about.html" class="active">About</a></li>
+        <li><a href="benefits.html">Benefits</a></li>
+        <li><a href="future.html">Future Scope</a></li>
+    </ul>
+    <div class="nav-right">
+        <div class="dot"></div>
+        SYSTEM ACTIVE
+    </div>
+</nav>
+
+<div class="page">
+
+    <!-- LEFT MAIN -->
+    <main class="main">
+
+        <div class="eyebrow">End-to-End Visibility Platform</div>
+
+        <h1 class="big-title">
+            SUPPLY<br>
+            <span class="accent">CHAIN</span><br>
+            ANALYSIS
+        </h1>
+
+        <p class="desc">
+            Comprehensive analytics across your entire supply chain.
+            Monitor revenue, defect rates, transportation, and every process
+            stage — in one unified view.
+        </p>
+
+        <div class="content-label">// What We Do</div>
+
+        <div class="content-block">
+            <p>
+                <strong>Supply chain analysis</strong> is the process of managing a company's production
+                and distribution — encompassing planning, sourcing, manufacturing, delivering, and
+                returning products and services. The primary goal of
+                <span class="hl">Supply Chain Management (SCM)</span> is to improve efficiency and
+                customer satisfaction at every touchpoint.
+            </p>
+        </div>
+
+        <div class="content-block">
+            <p>
+                Supply chain analytics empowers organizations to make <strong>smarter, quicker, and
+                more efficient decisions</strong> by collecting, analyzing, and interpreting data from
+                across the entire supply chain network. Teams gain deep insights, surface potential
+                issues before they escalate, and optimize the flow of goods — from raw materials all
+                the way to the end consumer.
+            </p>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat">
+                <div class="stat-value">360<span>°</span></div>
+                <div class="stat-label">Network Visibility</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">Real<span>-time</span></div>
+                <div class="stat-label">Data Insights</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">End<span>-to-End</span></div>
+                <div class="stat-label">Optimization</div>
+            </div>
+        </div>
+
+        <!-- Tags -->
+        <div class="tags">
+            <span class="tag">Planning</span>
+            <span class="tag">Sourcing</span>
+            <span class="tag">Manufacturing</span>
+            <span class="tag">Delivery</span>
+            <span class="tag">Returns</span>
+            <span class="tag">Predictive Analytics</span>
+            <span class="tag">Operational Efficiency</span>
+        </div>
+
+    </main>
+
+    <!-- RIGHT SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="sidebar-header">// Quick Access</div>
+
+        <div class="sidebar-item">
+            <div>
+                <div class="si-tag">01 / Analytics</div>
+                <div class="si-title">Revenue Generated</div>
+                <div class="si-desc">Income breakdown by product & region</div>
+            </div>
+            <span class="si-icon">↗</span>
+        </div>
+
+        <div class="sidebar-item">
+            <div>
+                <div class="si-tag">02 / Analytics</div>
+                <div class="si-title">Transportation Mode</div>
+                <div class="si-desc">Carrier performance & freight costs</div>
+            </div>
+            <span class="si-icon">↗</span>
+        </div>
+
+        <div class="sidebar-item">
+            <div>
+                <div class="si-tag">03 / Analytics</div>
+                <div class="si-title">Defect Rate</div>
+                <div class="si-desc">Quality metrics per product line</div>
+            </div>
+            <span class="si-icon">↗</span>
+        </div>
+
+        <div class="sidebar-item">
+            <div>
+                <div class="si-tag">04 / Process</div>
+                <div class="si-title">Planning</div>
+                <div class="si-desc">Demand forecasting & resource allocation</div>
+            </div>
+            <span class="si-icon">↗</span>
+        </div>
+
+        <div class="sidebar-item">
+            <div>
+                <div class="si-tag">05 / Process</div>
+                <div class="si-title">Customer</div>
+                <div class="si-desc">Fulfilment, satisfaction & returns</div>
+            </div>
+            <span class="si-icon">↗</span>
+        </div>
+
+        <div class="insight-box">
+            <div class="ib-label">// Platform Goal</div>
+            <p>Turning raw supply chain data into <strong>actionable intelligence</strong> — so every decision across planning, sourcing, and delivery is backed by real insight.</p>
+        </div>
+
+    </aside>
+
+</div>
+
+</body>
+</html>
